@@ -3,6 +3,9 @@
 """Task_01"""
 
 
+import json
+
+
 MY_DICT = {
     'A': 1.0,
     'B': 0.9,
@@ -33,8 +36,7 @@ def get_score_summary(my_arg1):
     my_arg = open(my_arg1, 'r')
     my_dict1 = {}
 
-    for line in open('inspection_results.csv'):
-        line = my_arg.readline()[1:]
+    for line in my_arg:
         parts = line.split(',')
         if parts[10] != 'P' and parts[10] != '':
             my_dict1.update({parts[0]: (parts[1], parts[10])})
@@ -55,6 +57,7 @@ def get_score_summary(my_arg1):
 
     bx_cn = 0
     bx_gr = 0
+
     my_dict2 = {}
     for _, value in my_dict1.iteritems():
         if value[0] == 'BROOKLYN':
@@ -78,3 +81,51 @@ def get_score_summary(my_arg1):
             bx_gr += MY_DICT[value[1]]
             my_dict2[value[0]] = (bx_cn, bx_gr/bx_cn)
     return my_dict2
+
+
+MY_DICT3 = {}
+
+
+def get_market_density(file_name):
+    """This function does some file calculations.
+
+    Args:
+        file_name(str): Argument to open file.
+
+    Returns:
+        dict: A dictionary of the number of green markets per borough.
+
+    Examples:
+
+    >>> get_market_density('green_markets.json')
+    {'BRONX': [32], 'BROOKLYN': [48], 'STATEN ISLAND': [2], 'MANHATTAN': [39], '
+    QUEENS': [16]}
+    """
+    my_val = json.load(open(file_name))
+    my_dict4 = {}
+    my_dict4['data'] = my_val['data']
+    bk_cn = 0
+    qn_cn = 0
+    mn_cn = 0
+    si_cn = 0
+    bx_cn = 0
+
+    for item in my_dict4['data']:
+        if item[8].upper().strip() == 'BROOKLYN':
+            bk_cn += 1
+        if item[8].upper().strip() == 'QUEENS':
+            qn_cn += 1
+        if item[8].upper().strip() == 'BRONX':
+            bx_cn += 1
+        if item[8].upper().strip() == 'MANHATTAN':
+            mn_cn += 1
+        if item[8].upper().strip() == 'STATEN ISLAND':
+            si_cn += 1
+
+    MY_DICT3['BROOKLYN'] = [bk_cn]
+    MY_DICT3['QUEENS'] = [qn_cn]
+    MY_DICT3['BRONX'] = [bx_cn]
+    MY_DICT3['MANHATTAN'] = [mn_cn]
+    MY_DICT3['STATEN ISLAND'] = [si_cn]
+
+    return MY_DICT3
