@@ -1,6 +1,6 @@
 #!usr/bin/env python
 # -*- coding: utf-8 -*-
-"""Task_01"""
+"""Task_01-03"""
 
 
 import json
@@ -35,7 +35,6 @@ def get_score_summary(my_arg1):
     """
     my_arg = open(my_arg1, 'r')
     my_dict1 = {}
-
     for line in my_arg:
         parts = line.split(',')
         if parts[10] != 'P' and parts[10] != '':
@@ -83,9 +82,6 @@ def get_score_summary(my_arg1):
     return my_dict2
 
 
-MY_DICT3 = {}
-
-
 def get_market_density(file_name):
     """This function does some file calculations.
 
@@ -101,6 +97,7 @@ def get_market_density(file_name):
     {'BRONX': [32], 'BROOKLYN': [48], 'STATEN ISLAND': [2], 'MANHATTAN': [39], '
     QUEENS': [16]}
     """
+    my_dict3 = {}
     my_val = json.load(open(file_name))
     my_dict4 = {}
     my_dict4['data'] = my_val['data']
@@ -122,10 +119,50 @@ def get_market_density(file_name):
         if item[8].upper().strip() == 'STATEN ISLAND':
             si_cn += 1
 
-    MY_DICT3['BROOKLYN'] = [bk_cn]
-    MY_DICT3['QUEENS'] = [qn_cn]
-    MY_DICT3['BRONX'] = [bx_cn]
-    MY_DICT3['MANHATTAN'] = [mn_cn]
-    MY_DICT3['STATEN ISLAND'] = [si_cn]
+    my_dict3['BROOKLYN'] = [bk_cn]
+    my_dict3['QUEENS'] = [qn_cn]
+    my_dict3['BRONX'] = [bx_cn]
+    my_dict3['MANHATTAN'] = [mn_cn]
+    my_dict3['STATEN ISLAND'] = [si_cn]
+    return my_dict3
 
-    return MY_DICT3
+
+def correlate_data(file1, file2, file3):
+    """This function does some value comparison.
+
+    Args:
+        file1(str): File name.
+        file2(str): File name.
+        file3(str): File name with output of function.
+
+    Returns:
+        dict: keyed by borough, whose values are tuples containing the borough f
+        ood score and the percentage density of green markets to restaurateurs a
+        s a float.
+
+    Examples:
+
+    >>> correlate_data('inspection_results.csv', 'green_markets.json', 'i.txt')
+    {'BRONX': (0.9762820512820514, 0.20512820512820512), 'BROOKLYN': (0.97458033
+    57314144, 0.11510791366906475), 'STATEN ISLAND': (0.9804347826086955, 0.0434
+    78260869565216), 'MANHATTAN': (0.9771390374331528, 0.05213903743315508), 'QU
+    EENS': (0.971980676328502, 0.03864734299516908)}
+    """
+    score = get_score_summary(file1)
+    green = get_market_density(file2)
+    output = {}
+    output['BROOKLYN'] = (score['BROOKLYN'][1], float(green['BROOKLYN'][0]) /
+                          score['BROOKLYN'][0])
+    output['QUEENS'] = (score['QUEENS'][1], float(green['QUEENS'][0]) /
+                        score['QUEENS'][0])
+    output['BRONX'] = (score['BRONX'][1], float(green['BRONX'][0]) /
+                       score['BRONX'][0])
+    output['MANHATTAN'] = (score['MANHATTAN'][1], float(green['MANHATTAN'][0]) /
+                           score['MANHATTAN'][0])
+    output['STATEN ISLAND'] = (score['STATEN ISLAND'][1],
+                               float(green['STATEN ISLAND'][0]) /
+                               score['STATEN ISLAND'][0])
+
+    file5 = open(file3, 'w')
+    json.dump(output, file5, indent=4)
+    return output
